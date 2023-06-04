@@ -1,0 +1,23 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "learning node, experess and mongodb",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start:prod": "SET NODE_ENV=production & nodemon server.js",
+    "debug": "ndb server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mongoose": "5",
+    "morgan": "^1.10.0",
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "ndb": "^1.1.5"
+  }
+}
