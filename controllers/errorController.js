@@ -17,20 +17,32 @@ const handleValidationErrorDB = err => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () => new AppError('Invalid token. Please login again!', 401);
+
+handleJWTExpiredError = () => new AppError('Your token has expired! please login again',401);
+
 module.exports = ((err, req, res, next) => {
   err.statusCode ??= 500;
   err.status ??= 'Error';
-  let error = { ...err };
+  let error = Object.assign(err, {});
   if (err.name === 'CastError') {
-    error = handleCastErrorDB(err);
+    error = handleCastErrorDB(error);
   }
   if (err.code === 11000) {
-    error = handleDuplicateDB(err);
+    error = handleDuplicateDB(error);
   }
   if (err.name === 'ValidationError') {
-    error = handleValidationErrorDB(err);
+    error = handleValidationErrorDB(error);
+  }
+  if (err.name === 'JSONWEBTOKENError') {
+    console.log('MEOW');
+    error = handleJWTError();
+  }
+  if (err.name === 'TokenExpiredError') {
+    error = handleJWTExpiredError();
   }
   if (error.isOperational) {
+    console.log(error.message, 'MESSAGEEGEE');
     res.status(error.statusCode).json({
       status: error.status,
       message: error.message
