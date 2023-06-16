@@ -35,14 +35,12 @@ module.exports = ((err, req, res, next) => {
     error = handleValidationErrorDB(error);
   }
   if (err.name === 'JSONWEBTOKENError') {
-    console.log('MEOW');
     error = handleJWTError();
   }
   if (err.name === 'TokenExpiredError') {
     error = handleJWTExpiredError();
   }
   if (error.isOperational) {
-    console.log(error.message, 'MESSAGEEGEE');
     res.status(error.statusCode).json({
       status: error.status,
       message: error.message

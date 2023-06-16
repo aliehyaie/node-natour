@@ -16,6 +16,13 @@ const signToken = id => {
 
 const createAndSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true
+  };
+  res.cookie('jwt', token, cookieOptions);
+  user.password = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -28,7 +35,7 @@ const createAndSendToken = (user, statusCode, res) => {
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  createAndSendToken(newUser,201,res);
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -50,12 +57,11 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect password', 401));
   }
 
-  createAndSendToken(user,200,res);
+  createAndSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  console.log(req.headers.authorization,'AUTH');
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
@@ -132,7 +138,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  createAndSendToken(user,200,res);
+  createAndSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -145,5 +151,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
-  createAndSendToken(user,200,res);
+  createAndSendToken(user, 200, res);
 });
